@@ -13,6 +13,19 @@
         white-space: nowrap;
         width: 500px;
       }
+      #contentCenterer {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+      }
+      #wordBox {
+        font-size: 2rem;
+      }
+      #wordButton {
+        
+      }
     </style>
   </head>
 
@@ -32,22 +45,9 @@
     </div>
 
     <script id="user-profile-template" type="text/x-handlebars-template">
-      <h1>Logged in as {{display_name}}</h1>
-      <div class="media">
-        <div class="pull-left">
-          <img class="media-object" width="150" src="{{images.0.url}}" />
-        </div>
-        <div class="media-body">
-          <dl class="dl-horizontal">
-            <dt>Display name</dt><dd class="clearfix">{{display_name}}</dd>
-            <dt>Id</dt><dd>{{id}}</dd>
-            <dt>Email</dt><dd>{{email}}</dd>
-            <dt>Spotify URI</dt><dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
-            <dt>Link</dt><dd><a href="{{href}}">{{href}}</a></dd>
-            <dt>Profile Image</dt><dd class="clearfix"><a href="{{images.0.url}}">{{images.0.url}}</a></dd>
-            <dt>Country</dt><dd>{{country}}</dd>
-          </dl>
-        </div>
+      <div id="contentCenterer">
+        <input type="text" id="wordBox" placeholder="Type a word here...."/>
+        <input type="button" id="wordButton" value="Generate Playlist!"/>
       </div>
     </script>
 
@@ -60,7 +60,7 @@
     </script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script>
       (function() {
 
@@ -108,12 +108,47 @@
                   'Authorization': 'Bearer ' + access_token
                 },
                 success: function(response) {
-                  userProfilePlaceholder.innerHTML = userProfileTemplate(response);
+                  document.body.innerHTML = userProfileTemplate(response);
 
-                  $('#login').hide();
-                  $('#loggedin').show();
+                  /*$('#login').hide();
+                  $('#loggedin').show();*/
+
+                  document.getElementById("wordButton").addEventListener("click", function(evt) {
+                    var inputWord = document.getElementById("wordBox").value;
+                    console.log(inputWord);
+                  });
                 }
             });
+
+            $.ajax({
+                url: 'https://api.spotify.com/v1/search',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                data: {
+                  "q": "lasagna",
+                  "type": "track",
+                },
+                success: function(searchResponse) {
+                  console.log(response);
+                  $.ajax({
+                    url: 'https://api.spotify.com/v1/users/{user_id}/playlists',
+                    headers: {
+                      'Authorization': 'Bearer ' + access_token
+                    },
+                    data: {
+                      "name": "lasagna",
+                      "description": "track",
+                      "public": false,
+                     },
+                    success: function(playlistResponse) {
+                      console.log(response);
+                  
+                    }
+                    });
+                }
+            });
+
           } else {
               // render initial screen
               $('#login').show();

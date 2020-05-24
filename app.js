@@ -15,7 +15,7 @@ var cookieParser = require('cookie-parser');
 
 var client_id = '***REMOVED***'; // Your client id
 var client_secret = '***REMOVED***'; // Your secret
-var redirect_uri = 'https://wordsearch.dx724.repl.run/callback'; // Your redirect uri
+var redirect_uri = 'https://wordsearch--dx724.repl.co/callback/'; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -55,6 +55,12 @@ app.get('/login', function(req, res) {
       redirect_uri: redirect_uri,
       state: state
     }));
+});
+
+app.get('/test', function(req, res) {
+  res.writeHead(200, {"Content-Type": "text/plain"});
+  res.write("test");
+  res.end();
 });
 
 app.get('/callback', function(req, res) {
