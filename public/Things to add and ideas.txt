@@ -1,0 +1,5 @@
+1) Genre Selecter
+   - Display with a  grid? and use buttons that are designed as checkboxes or invert color?
+   - Search bar for genres that aren't extremely popular
+2) Pass in a phrase or sentence and have a playlex that displays that
+3) Add in a limit button --> how many songs they want on the playlist

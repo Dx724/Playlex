@@ -1,8 +1,9 @@
 <!doctype html>
 <html>
   <head>
-    <title>Example of the Authorization Code flow with Spotify</title>
+    <title>Playlex</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Gudea:wght@400;700&display=swap" rel="stylesheet">
     <style type="text/css">
       #login, #loggedin {
         display: none;
@@ -19,21 +20,41 @@
         height: 100vh;
         align-items: center;
         justify-content: center;
+        background-color: black;
       }
-      #wordBox {
-        font-size: 2rem;
+      #wordBox, .wordButton {
+        border-radius: 3rem;
+        padding: 1.25rem 3.5rem;
+        box-shadow: none;
+        border: none;
       }
-      #wordButton {
-        
+      #resultLink {
+        font-size: 3rem;
+        font-family: 'Gudea', sans-serif;
+      }
+      #wordBox:focus, .wordButton:focus {
+        outline: none;
+      }
+      .wordButton {
+        margin-left: 30px;
+        background-color: #1DB954;
+        color: white;
+        font-weight: 700;
+      }
+      .wordButton:hover {
+        color: white;
+        text-decoration: none;
+        background-color: white;
+        color: #1DB954;
       }
     </style>
   </head>
 
   <body>
-    <div class="container">
       <div id="login">
-        <h1>This is an example of the Authorization Code flow</h1>
-        <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+        <div id="contentCenterer">
+          <a href="/login" class="wordButton">Log in with Spotify</a>
+        </div>
       </div>
       <div id="loggedin">
         <div id="user-profile">
@@ -42,12 +63,11 @@
         </div>
         <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
       </div>
-    </div>
 
     <script id="user-profile-template" type="text/x-handlebars-template">
       <div id="contentCenterer">
         <input type="text" id="wordBox" placeholder="Type a word here...."/>
-        <input type="button" id="wordButton" value="Generate Playlist!"/>
+        <input type="button" class="wordButton" value="Generate Playlist!"/>
       </div>
     </script>
 
@@ -61,7 +81,10 @@
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
     <script>
+      var target = 0;
+      const searchQty = 20;
       (function() {
 
         /**
@@ -92,9 +115,10 @@
             refresh_token = params.refresh_token,
             error = params.error;
 
+         
         if (error) {
           alert('There was an error during the authentication');
-        } else {
+        }else {  
           if (access_token) {
             // render oauth info
             oauthPlaceholder.innerHTML = oauthTemplate({
@@ -107,47 +131,104 @@
                 headers: {
                   'Authorization': 'Bearer ' + access_token
                 },
-                success: function(response) {
-                  document.body.innerHTML = userProfileTemplate(response);
+                success: function(userResponse) {
+                  document.body.innerHTML = userProfileTemplate(userResponse);
 
                   /*$('#login').hide();
                   $('#loggedin').show();*/
 
-                  document.getElementById("wordButton").addEventListener("click", function(evt) {
+                  document.getElementsByClassName("wordButton")[0].addEventListener("click", function(evt) {
                     var inputWord = document.getElementById("wordBox").value;
-                    console.log(inputWord);
+                    //boyfwend pls help me get this!!
+                    var genreList = ["pop", "r&b", "reggaeton", "edm"]; 
+                    var uriList = [];
+
+                    $.ajax({
+                      url: 'https://api.spotify.com/v1/search',
+                      headers: {
+                        'Authorization': 'Bearer ' + access_token
+                      },
+                      data: {
+                        "q": encodeURI(inputWord),
+                        "type": "track",
+                      },
+                      success: function(searchResponse) {
+                        console.log(searchResponse);
+                        $.ajax({
+                          url: "https://api.spotify.com/v1/users/" + userResponse.id + "/playlists",
+                          headers: {
+                            'Authorization': 'Bearer ' + access_token,
+                            'Content-Type': 'application/json'
+                          },
+                          data: JSON.stringify({
+                            "name": inputWord,
+                            "description": "Playlex::" + inputWord,
+                            "public": false,
+                          }),
+                          method: "POST",
+                          error: console.log,
+                          success: function(playlistResponse) {
+                            console.log(playlistResponse);
+                            $.ajax({
+                              url: "https://api.spotify.com/v1/playlists/" + playlistResponse.id + "/tracks",
+                              headers:{
+                                'Authorization': 'Bearer ' + access_token
+                              },
+                              success: function(playlistInfoResponse){
+                                console.log(playlistInfoResponse);
+
+                                for(let count = 0;count< searchResponse.tracks.items.length; count++){
+                                    //let tCount = count;
+                                    $.ajax({
+                                      url: "https://api.spotify.com/v1/artists/" + searchResponse.tracks.items[count].artists[0].id,
+                                      headers: {
+                                        'Authorization': 'Bearer ' + access_token
+                                      },
+                                      success: function(artistResponse){
+                                        console.log(artistResponse);  
+                                        console.log("T:" + count);                                  
+                                        for(var x of genreList){
+                                          if(artistResponse.genres.includes(x)){       
+                                            uriList.push(searchResponse.tracks.items[count].uri);               console.log("Uri List " + uriList);                             
+                                          }
+                                        }
+                                        incrementThenRun(playlistResponse, playlistResponse.id, access_token, uriList);
+                                        
+                                      },
+                                      error: function(artistjqXHR, artistErrorStatus, artistErrorThrown){
+                                        console.log(artistErrorStatus, artistErrorThrown);
+                                      }
+                                    });
+                                // console.log("toAddTrack state: " + toAddTrack);
+                                // if(toAddTrack)
+                                  //   uriList[count] = searchResponse.tracks.items[count].uri;
+                                  
+                                
+                                }
+
+                                },
+                                error: function(playInfojqXHR, playInfoErrorStatus, playInfoErrorThrown){
+                                  console.log(playInfoErrorStatus, playInfoErrorThrown);
+                                }
+                            });
+                          },
+                          error: function(playlistjqXHR, playlistErrorStatus, playlistErrorThrown){
+                            console.log(playlistErrorStatus, playlistErrorThrown);
+                          }
+                          });
+                      },
+                      error: function(searchjqXHR, searchErrorStatus, searchErrorThrown){
+                        console.log(searchErrorStatus, searchErrorThrown);
+                      }
                   });
+                  });
+                },
+                error: function(userjqXHR, userErrorStatus, userErrorThrown){
+                  console.log(userErrorStatus, userErrorThrown);
                 }
             });
 
-            $.ajax({
-                url: 'https://api.spotify.com/v1/search',
-                headers: {
-                  'Authorization': 'Bearer ' + access_token
-                },
-                data: {
-                  "q": "lasagna",
-                  "type": "track",
-                },
-                success: function(searchResponse) {
-                  console.log(response);
-                  $.ajax({
-                    url: 'https://api.spotify.com/v1/users/{user_id}/playlists',
-                    headers: {
-                      'Authorization': 'Bearer ' + access_token
-                    },
-                    data: {
-                      "name": "lasagna",
-                      "description": "track",
-                      "public": false,
-                     },
-                    success: function(playlistResponse) {
-                      console.log(response);
-                  
-                    }
-                    });
-                }
-            });
+            
 
           } else {
               // render initial screen
@@ -171,6 +252,40 @@
           }, false);
         }
       })();
+
+      function incrementThenRun(playlistResponse, playlistResponse_id, access_token, uriList){
+        if(target<searchQty-1){
+          target++;
+          console.log("Target: " + target);
+          console.log("Printing Uris : " + uriList);
+        }
+        else
+          addTracks(playlistResponse, playlistResponse_id, access_token, uriList);
+      }
+
+      function addTracks(playlistResponse, playlistResponse_id, access_token, uriList){
+        console.log("Running addTracks()");
+         $.ajax({
+          url:"https://api.spotify.com/v1/playlists/" + playlistResponse_id + "/tracks",
+          headers:{
+            'Authorization': 'Bearer ' + access_token,
+            'Content-Type': 'application/json'
+          },
+          data: JSON.stringify({
+            "uris": uriList,
+          }),
+          method: "POST",
+          success: function(addTrackResponse){
+            console.log(addTrackResponse);
+            document.getElementById("contentCenterer").innerHTML = "<a id=\"resultLink\" href=\"" + playlistResponse.external_urls.spotify + "\">" + playlistResponse.external_urls.spotify + "</a>";
+          },
+          error: function(trackjqXHR, trackErrorStatus, trackErrorThrown){
+            console.log(trackErrorStatus, trackErrorThrown);
+            console.log("before adding to tracks: " + uriList);
+          }
+        });
+      }
+
     </script>
   </body>
 </html>
