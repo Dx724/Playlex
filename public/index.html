@@ -173,6 +173,7 @@
     <script>
       var target = 0;
       const searchQty = 50;
+			const allGenres = ["pop", "dance pop", "rap", "rock", "latin", "hip hop", "trap", "edm", "tropical house"];
       (function() {
 
         /**
@@ -234,9 +235,9 @@
                       if(i.checked){
 											 if(i.id.includes("-"))
 											 		genreList.push(i.id.replace(/-/g, " "));
-                    	}
+                    	}											
 										}
-										
+										console.log(genreList);
                     var uriList = [];
 
                     $.ajax({
@@ -273,7 +274,9 @@
                               },
                               success: function(playlistInfoResponse){
                                 console.log(playlistInfoResponse);
-
+																if(genreList.length == 0)
+																	genreList = allGenres;
+																	
                                 for(let count = 0;count< searchResponse.tracks.items.length; count++){
                                     //let tCount = count;
                                     $.ajax({
@@ -286,7 +289,7 @@
                                         console.log("T:" + count);                                  
                                         for(var x of genreList){
                                           if(artistResponse.genres.includes(x)){       
-                                            uriList.push(searchResponse.tracks.items[count].uri);               console.log("Uri List " + uriList);                             
+                                            uriList.push(searchResponse.tracks.items[count].uri);  //console.log("Uri List " + uriList);                             
                                           }
                                         }
                                         incrementThenRun(playlistResponse, playlistResponse.id, access_token, uriList);
@@ -295,12 +298,7 @@
                                       error: function(artistjqXHR, artistErrorStatus, artistErrorThrown){
                                         console.log(artistjqXHR.responseText);
                                       }
-                                    });
-                                // console.log("toAddTrack state: " + toAddTrack);
-                                // if(toAddTrack)
-                                  //   uriList[count] = searchResponse.tracks.items[count].uri;
-                                  
-                                
+                                    });                                
                                 }
 
                                 },
@@ -354,7 +352,7 @@
         if(target<searchQty-1){
           target++;
           console.log("Target: " + target);
-          console.log("Printing Uris : " + uriList);
+          //console.log("Printing Uris : " + uriList);
         }
         else
           addTracks(playlistResponse, playlistResponse_id, access_token, uriList);
