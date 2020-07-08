@@ -1,103 +1,116 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Playlex</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Gudea:wght@400;700&display=swap" rel="stylesheet">
-    <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 500px;
-      }
-      #contentCenterer {
-        display: flex;
-        width: 100vw;
-        height: 100vh;
-        align-items: center;
-        justify-content: center;
-        background-color: black;
-        flex-direction: column;
-      }
-      #wordBox, .wordButton {
-        border-radius: 3rem;
-        padding: 1.25rem 3.5rem;
-        box-shadow: none;
-        border: none;
-      }
-      #resultLink {
-        font-size: 3rem;
-        font-family: 'Gudea', sans-serif;
-      }
-      #wordBox:focus, .wordButton:focus {
-        outline: none;
-      }
-      .wordButton {
-        margin-left: 30px;
-        background-color: #1DB954;
-        color: white;
-        font-weight: 700;
-      }
-      .wordButton:hover {
-        color: white;
-        text-decoration: none;
-        background-color: white;
-        color: #1DB954;
-      }
-      #genres{
-        margin-top: 40px;
-      }
-      .genre-list label{
-        text-align: center;
-        display: inline-grid;
-        grid-gap: 5px;
-        background: #1DB954;
-        color: white;
-        font-weight: 500;
-        border-radius: 0.5rem;
-        padding: 0.5rem;
 
-      }
-      .check{
-       visibility: hidden;
-       position: relative;
-       
-       overflow: hidden;
-       width: 13px;
-       height: 13px;
-       padding: 0;
+<head>
+	<title>Playlex</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Gudea:wght@400;700&display=swap" rel="stylesheet">
+	<style type="text/css">
+		#login,
+		#loggedin {
+			display: none;
+		}
+
+		.text-overflow {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			width: 500px;
+		}
+
+		#contentCenterer {
+			display: flex;
+			width: 100vw;
+			height: 100vh;
+			align-items: center;
+			justify-content: center;
+			background-color: black;
+			flex-direction: column;
+		}
+
+		#wordBox,
+		.wordButton {
+			border-radius: 3rem;
+			padding: 1.25rem 3.5rem;
+			box-shadow: none;
+			border: none;
+		}
+
+		#resultLink {
+			font-size: 3rem;
+			font-family: 'Gudea', sans-serif;
+		}
+
+		#wordBox:focus,
+		.wordButton:focus {
+			outline: none;
+		}
+
+		.wordButton {
+			margin-left: 30px;
+			background-color: #1DB954;
+			color: white;
+			font-weight: 700;
+		}
+
+		.wordButton:hover {
+			color: white;
+			text-decoration: none;
+			background-color: white;
+			color: #1DB954;
+		}
+
+		#genres {
+			margin-top: 40px;
+		}
+
+		.genre-list label {
+			text-align: center;
+			display: inline-grid;
+			grid-gap: 5px;
+			background: #1DB954;
+			color: white;
+			font-weight: 500;
+			border-radius: 0.5rem;
+			padding: 0.5rem;
+
+		}
+
+		.check {
+			visibility: hidden;
+			position: relative;
+
+			overflow: hidden;
+			width: 13px;
+			height: 13px;
+			padding: 0;
 
 
-      }
-      .check:checked + .checkLabel{
-        background: white;
-        color: #1DB954;
-        font-weight: bold;
-      }
+		}
 
-    
-}
+		.check:checked+.checkLabel {
+			background: white;
+			color: #1DB954;
+			font-weight: bold;
+		}
 
-      
-    </style>
-  </head>
 
-  <body>
-      <div id="login">
-        <div id="contentCenterer">
-          <a href="/login" class="wordButton">Log in with Spotify</a>
-        </div>
-      </div>
-      <div id="loggedin">
-        <div id="user-profile">
-        </div>
-        <div id="oauth">
-        </div>
-        <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+		}
+	</style>
+</head>
+
+<body>
+	<div id="login">
+		<div id="contentCenterer">
+			<a href="/login" class="wordButton">Log in with Spotify</a>
+		</div>
+	</div>
+	<div id="loggedin">
+		<div id="user-profile">
+		</div>
+		<div id="oauth">
+		</div>
+		<button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
       </div>
  
 
@@ -107,15 +120,16 @@
         <input type="text" id="wordBox" placeholder="Type a word here...."/>
         <input type="button" class="wordButton" value="Generate Playlist!"/>
         </div>
+				<div id = "limit">
+				</div>
        <div id = "genres">
         <form>
-          <!-- need to add action later maybe -->
-          <div class = "genre-list">
+          	<div class = "genre-list">
             <input class= "check" type = "checkbox" id="pop" name="pop" data-mini="true">
             <label class = "checkLabel" for = "pop">Pop</label>
             
-            <input class= "check" type = "checkbox" id="dancepop" name="dancepop" data-mini="true"> 
-            <label class = "checkLabel" for = "dancepop">Dance Pop</label>
+            <input class= "check" type = "checkbox" id="dance-pop" name="dance-pop" data-mini="true"> 
+            <label class = "checkLabel" for = "dance-pop">Dance Pop</label>
 
             <input class= "check" type = "checkbox" id="rap" name="rap" data-mini="true">
             <label class = "checkLabel" for = "rap">Rap</label>
@@ -126,8 +140,8 @@
             <input class= "check" type = "checkbox" id="latin" name="latin" data-mini="true">
             <label class = "checkLabel" for = "latin">Latin</label>
 
-            <input class= "check" type = "checkbox" id="hiphop" name="hiphop" data-mini="true">
-            <label class = "checkLabel" for = "hiphop">Hip Hop</label>
+            <input class= "check" type = "checkbox" id="hip-hop" name="hip-hop" data-mini="true">
+            <label class = "checkLabel" for = "hip-hop">Hip Hop</label>
            
             <input class= "check" type = "checkbox" id="trap" name="trap" data-mini="true">
             <label class = "checkLabel" for = "trap">Trap</label>
@@ -135,8 +149,8 @@
             <input class= "check" type = "checkbox" id="edm" name="edm" data-mini="true">
             <label class = "checkLabel" for = "edm">EDM</label>
             
-            <input class= "check" type = "checkbox" id="tropicalhouse" name="tropicalhouse" data-mini="true">                   
-            <label class = "checkLabel" for = "tropicalhouse">Tropical House</label>
+            <input class= "check" type = "checkbox" id="tropical-house" name="tropical-house" data-mini="true">                   
+            <label class = "checkLabel" for = "tropical-house">Tropical House</label>
 
         </form> 
 
@@ -158,7 +172,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
     <script>
       var target = 0;
-      const searchQty = 20;
+      const searchQty = 50;
       (function() {
 
         /**
@@ -213,14 +227,16 @@
 
                   document.getElementsByClassName("wordButton")[0].addEventListener("click", function(evt) {
                     var inputWord = document.getElementById("wordBox").value;
-                    //boyfwend pls help me get this!!
+
                     var genreList = [];
 
                     for(var i of document.getElementsByClassName("check")){
-                      if(i.checked)
-                       genreList.push(i.id);
-                    }
-
+                      if(i.checked){
+											 if(i.id.includes("-"))
+											 		genreList.push(i.id.replace(/-/g, " "));
+                    	}
+										}
+										
                     var uriList = [];
 
                     $.ajax({
@@ -231,6 +247,7 @@
                       data: {
                         "q": encodeURI(inputWord),
                         "type": "track",
+												"limit": 50,
                       },
                       success: function(searchResponse) {
                         console.log(searchResponse);
@@ -365,8 +382,8 @@
           }
         });
       }
+			
 
     </script>
   </body>
 </html>
-
