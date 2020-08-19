@@ -60,8 +60,9 @@
 			color: #1DB954;
 		}
 
+
 		#genres {
-			margin-top: 40px;
+			margin-top: 30px;
 		}
 
 		.genre-list label {
@@ -94,7 +95,22 @@
 			font-weight: bold;
 		}
 
+		#playlist-limit{
+			color: white;
+			font-weight: 500;
+			margin-top: 40px;
+		}
 
+		#playlist-limit p{
+			display: inline-block;
+			margin-left: 10px;
+		}
+
+		#limit{
+			color: black;
+			text-align: center;
+			width: 4em;
+		}
 		}
 	</style>
 </head>
@@ -120,8 +136,13 @@
         <input type="text" id="wordBox" placeholder="Type a word here...."/>
         <input type="button" class="wordButton" value="Generate Playlist!"/>
         </div>
-				<div id = "limit">
+				
+				<div id = "playlist-limit">
+				<label for="limit" class="limit">Playlist Limit:</label>
+				<input type="number" id="limit" name="limit" class="limit" min="1" max="50">
+				<p>Enter a number between 1 and 50.</p>
 				</div>
+			 
        <div id = "genres">
         <form>
           	<div class = "genre-list">
@@ -152,10 +173,11 @@
             <input class= "check" type = "checkbox" id="tropical-house" name="tropical-house" data-mini="true">                   
             <label class = "checkLabel" for = "tropical-house">Tropical House</label>
 
+					</div>
         </form> 
+      </div>
 
-      </div>
-      </div>
+    	</div>
       
     </script>
 
@@ -228,6 +250,7 @@
 
                   document.getElementsByClassName("wordButton")[0].addEventListener("click", function(evt) {
                     var inputWord = document.getElementById("wordBox").value;
+										
 
                     var genreList = [];
 
@@ -239,7 +262,10 @@
 										}
 										console.log(genreList);
                     var uriList = [];
-
+										var limit = document.getElementById("limit").value-1;
+										if(limit>49 || limit<0){
+											alert("Please enter a number between 1 and 50");
+										}else {
                     $.ajax({
                       url: 'https://api.spotify.com/v1/search',
                       headers: {
@@ -252,6 +278,9 @@
                       },
                       success: function(searchResponse) {
                         console.log(searchResponse);
+												if(searchResponse.tracks.items.length==0){
+													alert("Could not find any songs with the input word. Please enter a different word");
+												}else {
                         $.ajax({
                           url: "https://api.spotify.com/v1/users/" + userResponse.id + "/playlists",
                           headers: {
@@ -276,7 +305,7 @@
                                 console.log(playlistInfoResponse);
 																if(genreList.length == 0)
 																	genreList = allGenres;
-																	
+
                                 for(let count = 0;count< searchResponse.tracks.items.length; count++){
                                     //let tCount = count;
                                     $.ajax({
@@ -288,8 +317,9 @@
                                         console.log(artistResponse);  
                                         console.log("T:" + count);                                  
                                         for(var x of genreList){
-                                          if(artistResponse.genres.includes(x)){       
-                                            uriList.push(searchResponse.tracks.items[count].uri);  //console.log("Uri List " + uriList);                             
+                                          if(artistResponse.genres.includes(x) && uriList.length<=limit){  
+                                            uriList.push(searchResponse.tracks.items[count].uri);
+																						break;                        
                                           }
                                         }
                                         incrementThenRun(playlistResponse, playlistResponse.id, access_token, uriList);
@@ -311,11 +341,13 @@
                             console.log(playlistjqXHR.responseText);
                           }
                           });
-                      },
+												}
+											},
                       error: function(searchjqXHR, searchErrorStatus, searchErrorThrown){
                         console.log(searchjqXHR.responseText);
                       }
                   });
+									}
                   });
                 },
                 error: function(userjqXHR, userErrorStatus, userErrorThrown){
@@ -375,7 +407,7 @@
             document.getElementById("contentCenterer").innerHTML = "<a id=\"resultLink\" href=\"" + playlistResponse.external_urls.spotify + "\">" + playlistResponse.external_urls.spotify + "</a>";
           },
           error: function(trackjqXHR, trackErrorStatus, trackErrorThrown){
-            console.log(trackErrorStatus, trackErrorThrown);
+            console.log(trackjqXHR.responseText);
             console.log("before adding to tracks: " + uriList);
           }
         });
