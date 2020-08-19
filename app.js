@@ -13,8 +13,8 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-var client_id = '***REMOVED***'; // Your client id
-var client_secret = '***REMOVED***'; // Your secret
+var client_id = '***REPLACE***'; // Your client id
+var client_secret = '***REPLACE***'; // Your secret
 var redirect_uri = 'https://wordsearch--dx724.repl.co/callback/'; // Your redirect uri
 
 /**
